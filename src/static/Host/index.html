@@ -1,0 +1,60 @@
+<!-- This is the host, or originator of the game -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- QR -->
+    <!--  <script type="text/javascript" src="assets/QR/jquery.min.js"></script> -->
+    <script type="text/javascript" src="assets/QR/qrcode.js"></script>
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Monoton|Space+Mono:700" rel="stylesheet">
+
+    <!-- Style.css -->
+    <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+    <!-- Intro Section -->
+    <div class="container-fluid text-center intro-section" id="logon">
+        <div class="animated fadeIn logo">Stu's Test<br>Start a new game! </div>
+        <div class="row intro">
+            <div class="col-sm-12 text-center">
+                What's Your game's name ?
+                <h3 class="animated fadeIn">
+                    <form id="form">
+                        <input type="text" id="gamename" value="" autofocus />
+                    </form>
+                    <button class="btn-large btn-flat animated bounceInUp tooltipped" onclick="RoomObject.doQRCode()" data-position="right" data-delay="50" data-tooltip="Click To Create Game." id="createBtn">Create Game</button>
+                    <button class="btn-large btn-flat animated bounceInUp tooltipped" onclick="RoomObject.join()" data-position="right" data-delay="50" data-tooltip="Click To Join Game." id="joinBtn">Join Game</button>
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var size = window.innerHeight / 3;
+    </script>
+    <div id="qrcode" style="width:size; height:size; margin-top:15px;">
+        <button class="btn-large btn-flat animated bounceInUp tooltipped" onclick="" data-position="right" data-delay="50" data-tooltip="Click To invite others." id="inviteBtn">Invite Friends</button>
+    </div>
+
+    <!-- Compiled and minified JavaScript materialize -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/js/materialize.min.js"></script>
+
+    <!-- app.js -->
+    <script type="text/javascript" src="assets/javascript/app.js"></script>
+
+</body>
+</html>

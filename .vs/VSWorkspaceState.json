@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\static",
+    "\\src\\static\\Clients",
+    "\\src\\static\\Clients\\assets",
+    "\\src\\static\\Clients\\assets\\css",
+    "\\src\\static\\Clients\\assets\\javascript",
+    "\\src\\static\\Host",
+    "\\src\\static\\Host\\assets",
+    "\\src\\static\\Host\\assets\\javascript"
+  ],
+  "SelectedNode": "\\src\\static\\TV\\assets\\javascript\\app.js",
+  "PreviewInSolutionExplorer": false
+}

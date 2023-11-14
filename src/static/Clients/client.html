@@ -33,7 +33,7 @@
                     <form id="form">
                         <input type="text" id="username" value="" autofocus />
                     </form>
-                    <button class="btn-large btn-flat animated bounceInUp tooltipped" onclick="RoomObject.join()" data-position="right" data-delay="50" data-tooltip="Click To Join." id="joinBtn">Join</button>
+                    <button class="btn-large btn-flat animated bounceInUp" onclick="RoomObject.gotoLobby()" data-position="right" data-delay="50" data-tooltip="Click To Join." id="joinBtn">Join</button>
                 </h3>
             </div>
         </div>
@@ -47,8 +47,8 @@
                     <form id="form2">
                         <input type="text" id="sendMessage" value="" autofocus />
                     </form>
-                    <button class="btn-large btn-flat animated bounceInUp tooltipped" data-position="right" data-delay="50" data-tooltip="Send a message to the chat." id="sendMsgBtn">Send Message</button>
-                    <button class="btn-large btn-flat animated bounceInUp tooltipped" data-position="right" data-delay="50" data-tooltip="Click To Start." id="startGameBtn">Start Game</button>
+                    <button class="btn-large btn-flat animated bounceInUp" data-position="right" data-delay="50" data-tooltip="Send a message to the chat." id="sendMsgBtn">Send Message</button>
+                    <button class="btn-large btn-flat animated bounceInUp" onclick="RoomObject.join()" data-position="right" data-delay="50" data-tooltip="Click To Start." id="startGameBtn">Start Game</button>
                 </h3>
             </div>
         </div>
@@ -56,15 +56,13 @@
 
     <div id="messages"></div>
 
+    <div id="controls">
+        <button class="btn-large btn-flat animated bounceInUp" data-position="right" id="upBtn" onclick="RoomObject.up()">up</button>
+        <button class="btn-large btn-flat animated bounceInUp" data-position="right" id="downBtn" onclick="RoomObject.down()">down</button>
+        <button class="btn-large btn-flat animated bounceInUp" data-position="right" id="leftBtn" onclick="RoomObject.left()">left</button>
+        <button class="btn-large btn-flat animated bounceInUp" data-position="right" id="rightBtn" onclick="RoomObject.right()">right</button>
+    </div>
     <!-- <button onclick="leave()">Leave room</button> -->
-
-    <br />
-    <button onclick="RoomObject.up()">up</button>
-    <button onclick="RoomObject.down()">down</button>
-    <br />
-    <button onclick="RoomObject.left()">left</button>
-    <button onclick="RoomObject.right()">right</button>
-
     <!-- Compiled and minified JavaScript materialize -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/js/materialize.min.js"></script>
 
