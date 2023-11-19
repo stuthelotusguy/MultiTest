@@ -14,6 +14,7 @@ import { StateHandlerRoom } from "./rooms/02-state-handler";
 import { AuthRoom } from "./rooms/03-auth";
 import { ReconnectionRoom } from './rooms/04-reconnection';
 import { CustomLobbyRoom } from './rooms/07-custom-lobby-room';
+import { GameHandlerRoom } from './rooms/tenfoot';
 
 export default config({
     options: {
@@ -52,6 +53,9 @@ export default config({
 
         // Define "custom_lobby" room
         gameServer.define("custom_lobby", CustomLobbyRoom);
+
+        // Define "tenfoot" room
+        gameServer.define("tenfoot", GameHandlerRoom).enableRealtimeListing();
 
         gameServer.onShutdown(function(){
             console.log(`game server is going down.`);

@@ -59,6 +59,11 @@
                 dom.innerText = "Player " + sessionId;
 
                 player.onChange(function (changes) {
+                    changes.forEach(change => {
+                        console.log(change.field);
+                        console.log(change.value);
+                        console.log(change.previousValue);
+                    })
                     dom.style.left = player.x + "px";
                     dom.style.top = player.y + "px";
                 });

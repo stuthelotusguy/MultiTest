@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Colyseus -->
+	<script src="https://unpkg.com/colyseus.js@^0.15.11/dist/colyseus.js"></script>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- jQuery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<!-- Animate.css -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
+
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Monoton|Space+Mono:700" rel="stylesheet">
+
+	<!-- Style.css -->
+	<link href="assets/css/style.css" rel="stylesheet" type="text/css">
+
+	<title>Trivia Game</title>
+
+</head>
+<body>
+
+    <div class="wrapper">
+        <!--
+            Joystick Controls.
+            <hr>
+            <div id="status1" style="color: red;">Joystick 1</div>
+            <div id="status2" style="color: blue;">Joystick 2</div>
+
+            <hr>
+        -->
+            <div id="joystick"
+            <div style="border: 1px solid red; width: 128px; position: absolute; left:10px; top:150px;">
+                <img src="assets/images/joystick-base.png" />
+                <div id="stick1" style="position: absolute; left:32px; top:32px;">
+                    <img src="assets/images/joystick-red.png" />
+                </div>
+                </div>
+            </div>
+
+            <!--
+                   <div class="full">
+                       <img src="assets/images/controls.png" id="controls">
+                   </div>
+        -->
+        <!-- Intro Section -->
+        <div class="container-fluid text-center intro-section">
+            <div class="animated fadeIn logo">Stu's Trivia Test </div>
+            <div class="row intro">
+                <div class="col-sm-12 text-center">
+                    What's Your name ?
+                    <h3 class="animated fadeIn">
+                        <form id="form">
+                            <input type="text" id="name" value="" autofocus />
+                        </form>
+                        <button class="btn-large btn-flat animated bounceInUp " data-position="right" data-delay="50" data-tooltip="Click To Join." id="joinBtn">Join</button>
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lobby Section -->
+        <div class="container-fluid text-center lobby-section" id='lobby'>
+            <div class="row lobby">
+                <div class="col-sm-12 text-center">
+                    <h3 class="animated fadeIn">
+                        <form id="form2">
+                            <input type="text" id="sendMessage" value="" autofocus />
+                        </form>
+                        <button class="btn-large btn-flat animated bounceInUp " data-position="right" data-delay="50" data-tooltip="Send a message to the chat." id="sendMsgBtn">Send Message</button>
+                        <button class="btn-large btn-flat animated bounceInUp " data-position="right" data-delay="50" data-tooltip="Click To Start." id="startGameBtn">Start Game</button>
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div id="messages"></div>
+
+    </div>
+
+    <!-- Compiled and minified JavaScript materialize -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/js/materialize.min.js"></script>
+
+    <!-- multitouch.js -->
+    <script type="text/javascript" src="assets/javascript/multitouch.js"></script>
+
+    <!-- app.js -->
+    <script type="text/javascript" src="assets/javascript/clients.js"></script>
+</body>
+</html>
