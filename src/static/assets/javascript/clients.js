@@ -157,7 +157,7 @@ class gameObject {
                 $('#sendMsgBtn').on('click', function (event) {
                     // send data to room
                     var p = document.getElementById('sendMessage');
-                    Ourroom.send("message", p.value);
+                    Ourroom.send("message", document.getElementById('name').value + " : "+ p.value);
                     // clear input
                     p.value = "";
                 });

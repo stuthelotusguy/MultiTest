@@ -30,7 +30,7 @@ var gameObject = {
                 const modifiedMessage = message.replace(/\(.*?\)/g, "");
                 p.innerText = modifiedMessage;
                 console.log(message)
-                document.querySelector("#messages").appendChild(p);
+                document.querySelector(".messages").appendChild(p);
             });
         });
 
@@ -371,17 +371,18 @@ function renderCar(car, index) {
         if (((maxReverse === reverse) || (maxPower === power)) && Math.abs(angularVelocity) < 0.002) {
             return;
         }
+        size = 6;
         ctx.fillRect(
-            x - Math.cos(angle + 3 * Math.PI / 2) * 3 + Math.cos(angle + 2 * Math.PI / 2) * 3,
-            y - Math.sin(angle + 3 * Math.PI / 2) * 3 + Math.sin(angle + 2 * Math.PI / 2) * 3,
-            1,
-            1
+            x - Math.cos(angle + 3 * Math.PI / 2) * size + Math.cos(angle + 2 * Math.PI / 2) * size,
+            y - Math.sin(angle + 3 * Math.PI / 2) * size + Math.sin(angle + 2 * Math.PI / 2) * size,
+            2,
+            2
         );
         ctx.fillRect(
-            x - Math.cos(angle + 3 * Math.PI / 2) * 3 + Math.cos(angle + 4 * Math.PI / 2) * 3,
-            y - Math.sin(angle + 3 * Math.PI / 2) * 3 + Math.sin(angle + 4 * Math.PI / 2) * 3,
-            1,
-            1
+            x - Math.cos(angle + 3 * Math.PI / 2) * size + Math.cos(angle + 4 * Math.PI / 2) * size,
+            y - Math.sin(angle + 3 * Math.PI / 2) * size + Math.sin(angle + 4 * Math.PI / 2) * size,
+            2,
+            2
         );
     }
 
