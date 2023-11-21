@@ -41,9 +41,25 @@ var gameObject = {
             Gameroom.state.players.onAdd(function (player, sessionId) {
                 let car = carsById[sessionId];
 
-                if (Gameroom.sessionId != sessionId)
+                if (Gameroom.sessionId != sessionId && car !== null)
                 {
-                    car = localCar;
+                    car = {
+                        $el: null,
+                        x: WIDTH / 2,
+                        y: HEIGHT / 2,
+                        xVelocity: 0,
+                        yVelocity: 0,
+                        power: 0,
+                        reverse: 0,
+                        angle: 0,
+                        angularVelocity: 0,
+                        isThrottling: 0,
+                        isReversing: 0,
+                        isShooting: 0,
+                        name: '',
+                        points: 0,
+                        player: null
+                    };
                     const $el = document.createElement('div');
                     $el.classList.add('car');
                     const $body = document.createElement('div');
@@ -55,7 +71,7 @@ var gameObject = {
                     $body.appendChild($roof);
                     $el.appendChild($body);
                     $el.appendChild($name);
-                    //$cars.appendChild($el);
+                    $cars.appendChild($el);
                     car.name = sessionId;
                     car.$el = $el;
                     carsById[sessionId] = car;
@@ -70,50 +86,48 @@ var gameObject = {
                             console.log(change.field);
                             console.log(change.value);
                             console.log(change.previousValue);
-                            if (change.field === "inputUp") {
-                                if (change.value === 1) {
-                                    car.inputUp = 1;
-                                } else {
-                                    car.inputUp = 0;
-                                }
-                            }
-                            if (change.field === "inputDown") {
-                                if (change.value === 1) {
-                                    car.inputDown = 1;
-                                } else {
-                                    car.inputDown = 0;
-                                }
-                            }
-                            if (change.field === "inputLeft") {
-                                if (change.value === 1) {
-                                    car.inputLeft = 1;
-                                } else {
-                                    car.inputLeft = 0;
-                                }
-                            }
-                            if (change.field === "inputRight") {
-                                if (change.value === 1) {
-                                    car.inputRight = 1;
-                                } else {
-                                    car.inputRight = 0;
-                                }
-                            }
-                            if (change.field === "inputFire") {
-                                if (change.value === 1) {
-                                    car.inputFire = 1;
-                                } else {
-                                    car.inputFire = 0;
-                                }
-                            }
+                            if (change.field === "x") { car.x = change.value; }
+                            if (change.field === "y") { car.y = change.value; }
+                            if (change.field === "xVelocity") { car.xVelocity = change.value; }
+                            if (change.field === "yVelocity") { car.yVelocity = change.value; }
+                            if (change.field === "power") { car.power = change.value; }
+                            if (change.field === "reverse") { car.reverse = change.value; }
+                            if (change.field === "angle") { car.angle = change.value; }
+                            if (change.field === "angularVelocity") { car.angularVelocity = change.value; }
+                            if (change.field === "isThrottling") { car.isThrottling = change.value; }
+                            if (change.field === "isReversing") { car.isReversing = change.value; }
+                            if (change.field === "isShooting") { car.isShooting = change.value; }
+                            if (change.field === "isTurningLeft") { car.isTurningLeft = change.value; }
+                            if (change.field === "isTurningRight") { car.isTurningRight = change.value; }
+                            if (change.field === "isHit") { car.isHit = change.value; }
+                            if (change.field === "isShot") { car.isShot = change.value; }
+                            if (change.field === "name") { car.name = change.value; }
+                            if (change.field === "points") { car.points = change.value; }
                         })
-                        applyInputs(car);
                     })
                 }
             });
 
             Gameroom.state.players.onRemove(function (player, sessionId) {
-                document.body.removeChild(players[sessionId]);
-                delete players[sessionId];
+                const car = carsById[sessionId];
+
+                if (!car) {
+                    return console.error('Car not found');
+                }
+
+                for (let i = 0; i < cars.length; i++) {
+                    if (cars[i] === car) {
+                        cars.splice(i, 1);
+                        break;
+                    }
+                }
+
+                if (car.$el.parentNode) {
+                    car.$el.parentNode.removeChild(car.$el);
+                }
+                delete carsById[sessionId];
+                //document.body.removeChild(players[sessionId]);
+                //delete players[sessionId];
             });
         });
     },
@@ -138,8 +152,8 @@ const drag = 0.95;
 const angularDrag = 0.95;
 const turnSpeed = 0.002;
 
-const WIDTH = 1500;
-const HEIGHT = 1500;
+const WIDTH = 1000;
+const HEIGHT = 1000;
 
 const $canvas = document.querySelector('canvas');
 
@@ -167,9 +181,10 @@ const localCar = {
     reverse: 0,
     angle: 0,
     angularVelocity: 0,
-    isThrottling: false,
-    isReversing: false,
-    isShooting: false,
+    isThrottling: 0,
+    isReversing: 0,
+    isShooting: 0,
+    name:'anonymous',
     points: 0,
     player: null
 };
@@ -179,7 +194,7 @@ const scene = {
     y: window.innerHeight / 2/* - localCar.y*/
 };
 
-const cars = [localCar];
+cars = [];
 const carsById = {};
 
 if (window.location.search === '?test') {
@@ -191,6 +206,8 @@ if (window.location.search === '?test') {
 const bullets = [];
 
 function updateCar(car, i) {
+
+    /*
     if (car.isHit || car.isShot) {
         //if (car === localCar) 
         {
@@ -202,6 +219,7 @@ function updateCar(car, i) {
             car.yVelocity = 0;
         }
     }
+    */
 
     if (car.isThrottling) {
         car.power += powerFactor * car.isThrottling;
@@ -253,63 +271,6 @@ function updateCar(car, i) {
 }
 
 function applyInputs(car, i){
-    let changed;
-
-    const canTurn = car.power > 0.0025 || car.reverse;
-
-    if (car.player === null)
-        return;
-
-    const controls = {
-        up: car.inputUp,
-        left: car.inputLeft,
-        right: car.inputRight,
-        down: car.inputDown,
-        shoot: car.inputFire
-        };
-
-    const throttle = Math.round(controls.up * 10) / 10;
-    const reverse = Math.round(controls.down * 10) / 10;
-    const isShooting = controls.shoot;
-
-    if (isShooting !== car.isShooting) {
-        changed = true;
-        car.isShooting = isShooting;
-    }
-
-    if (car.isThrottling !== throttle || car.isReversing !== reverse) {
-        changed = true;
-        car.isThrottling = throttle;
-        car.isReversing = reverse;
-    }
-    const turnLeft = canTurn && Math.round(controls.left * 10) / 10;
-    const turnRight = canTurn && Math.round(controls.right * 10) / 10;
-
-    if (car.isTurningLeft !== turnLeft) {
-        changed = true;
-        car.isTurningLeft = turnLeft;
-    }
-    if (car.isTurningRight !== turnRight) {
-        changed = true;
-        car.isTurningRight = turnRight;
-    }
-
-    if (car.x > WIDTH + 7.5) {
-        car.x -= WIDTH + 15;
-        changed = true;
-    } else if (car.x < -7.5) {
-        car.x += WIDTH + 15;
-        changed = true;
-    }
-
-    if (car.y > HEIGHT + 7.5) {
-        car.y -= HEIGHT + 15;
-        changed = true;
-    } else if (car.y < -7.5) {
-        car.y += HEIGHT + 15;
-        changed = true;
-    }
-
     for (let i = 0; i < cars.length; i++) {
         const car2 = cars[i];
 
@@ -424,10 +385,8 @@ function renderCar(car, index) {
         );
     }
 
-    /*
-    if (car !== localCar)
     {
-        const angle = Math.atan2((car.y - localCar.y), (car.x - localCar.x));
+        const angle = Math.atan2((car.y - (HEIGHT / 2)), (car.x - (WIDTH / 2)));
 
         let $mapitem = $map.childNodes[index - 1];
 
@@ -442,7 +401,6 @@ function renderCar(car, index) {
 
         $mapitem.style.transform = `translate(${x}px, ${y}px)`;
     }
-    */
 }
 
 function render(ms) {
@@ -457,11 +415,13 @@ function render(ms) {
 
     cars.forEach(renderCar);
 
-    /* Map view
-    while ($map.childNodes.length > cars.length - 1) {
-        $map.removeChild($map.childNodes[$map.childNodes.length - 1]);
+/* Map view */
+    if (cars.length > 0) {
+        while ($map.childNodes.length > cars.length - 1) {
+            $map.removeChild($map.childNodes[$map.childNodes.length - 1]);
+        }
     }
-    */
+
     const now = Date.now();
 
     for (let i = 0; i < bullets.length; i++) {
@@ -481,173 +441,7 @@ function render(ms) {
             }
         }
     }
-
-    if (1) {
-    } else {
-        scene.x = window.innerWidth / 2 - localCar.x;
-        scene.y = window.innerHeight / 2 - localCar.y;
-
-        $scene.style.transform = `translate(${scene.x}px, ${scene.y}px)`;
-    }
 }
-
-/*
- function sendParams(car) {
-    const {
-        x,
-        y,
-        xVelocity,
-        yVelocity,
-        power,
-        reverse,
-        angle,
-        angularVelocity,
-        isThrottling,
-        isReversing,
-        isShooting,
-        isTurningLeft,
-        isTurningRight,
-        isHit,
-        isShot,
-        name,
-        points
-    } = car;
-    if (Ourroom !== null) {
-        Ourroom.send("move", {
-            Ourroom, car
-        })
-    }
-    ;
-};
-*/
-requestAnimationFrame(render);
-
-/*
- const socket = io('192.168.0.75', {
-    withCredentials: true
-  });
-
-  socket.on('connect', () => {
-    sendParams(localCar);
-  });
-
-  socket.on('join', () => {
-    sendParams(localCar);
-  });
-
-  socket.on('params', ({ id, params }) => {
-    let car = carsById[id];
-
-    if (!car) {
-      const $el = document.createElement('div');
-      $el.classList.add('car');
-      const $body = document.createElement('div');
-      $body.classList.add('car-body');
-      const $roof = document.createElement('div');
-      $roof.classList.add('car-roof');
-      const $name = document.createElement('div');
-      $name.classList.add('car-name');
-      $body.appendChild($roof);
-      $el.appendChild($body);
-      $el.appendChild($name);
-      $cars.appendChild($el);
-      car = {
-        $el
-      };
-      carsById[id] = car;
-      cars.push(car);
-    }
-
-    for (const key in params) {
-      if (key !== 'el') {
-        car[key] = params[key];
-      }
-    }
-  });
-
-  socket.on('leave', (id) => {
-    const car = carsById[id];
-
-    if (!car) {
-      return console.error('Car not found');
-    }
-
-    for (let i = 0; i < cars.length; i++) {
-      if (cars[i] === car) {
-        cars.splice(i, 1);
-        break;
-      }
-    }
-
-    if (car.$el.parentNode) {
-      car.$el.parentNode.removeChild(car.$el);
-    }
-    delete carsById[id];
-  });
-
-  function sendParams (car) {
-    const {
-      x,
-      y,
-      xVelocity,
-      yVelocity,
-      power,
-      reverse,
-      angle,
-      angularVelocity,
-      isThrottling,
-      isReversing,
-      isShooting,
-      isTurningLeft,
-      isTurningRight,
-      isHit,
-      isShot,
-      name,
-      points
-    } = car;
-
-    socket.emit('params', {
-      x,
-      y,
-      xVelocity,
-      yVelocity,
-      power,
-      reverse,
-      angle,
-      angularVelocity,
-      isThrottling,
-      isReversing,
-      isShooting,
-      isTurningLeft,
-      isTurningRight,
-      isHit,
-      isShot,
-      name,
-      points
-    });
-  }
-  */
-  const $disconnect = document.querySelector('.disconnect');
-
-  $disconnect.onclick = () => {
-    socket.disconnect();
-
-    localCar.name = '';
-
-    while (cars.length > 1) {
-      const car = cars.pop();
-
-      car.$el.parentNode.removeChild(car.$el);
-    }
-
-    $disconnect.parentNode.removeChild($disconnect);
-  };
-
-  const $clearScreen = document.querySelector('.clearscreen');
-
-  $clearScreen.onclick = () => {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-  };
 
   setInterval(() => {
     ctx.fillStyle = 'hsla(0, 0%, 95%, 0.2)';
@@ -659,15 +453,7 @@ requestAnimationFrame(render);
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) < (r1 + r2);
   }
 
-  const $name = document.querySelector('.name');
-
-  $name.querySelector('form').onsubmit = (e) => {
-    e.preventDefault();
-
-    localCar.name = $name.querySelector('input').value || '';
-
-    $name.parentNode.removeChild($name);
-  };
+requestAnimationFrame(render);
 
 window.onload = function () {
 

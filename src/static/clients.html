@@ -31,16 +31,21 @@
 </head>
 <body>
 
-    <div class="wrapper">
-        <!--
-            Joystick Controls.
-            <hr>
-            <div id="status1" style="color: red;">Joystick 1</div>
-            <div id="status2" style="color: blue;">Joystick 2</div>
+    <!--
+    <google-cast-launcher id="castbutton" style="display: block"></google-cast-launcher>
+    -->
 
-            <hr>
-        -->
-            <div id="joystick"
+    <div class="wrapper">
+
+        <!--
+        Joystick Controls.
+        <hr>
+        <div id="status1" style="color: red;">Joystick 1</div>
+        <div id="status2" style="color: blue;">Joystick 2</div>
+
+        <hr>
+    -->
+        <div id="joystick"
             <div style="border: 1px solid red; width: 128px; position: absolute; left:10px; top:150px;">
                 <img src="assets/images/joystick-base.png" />
                 <div id="stick1" style="position: absolute; left:32px; top:32px;">
@@ -49,11 +54,11 @@
                 </div>
             </div>
 
-            <!--
-                   <div class="full">
-                       <img src="assets/images/controls.png" id="controls">
-                   </div>
-        -->
+        <!--
+               <div class="full">
+                   <img src="assets/images/controls.png" id="controls">
+               </div>
+    -->
         <!-- Intro Section -->
         <div class="container-fluid text-center intro-section">
             <div class="animated fadeIn logo">Stu's Trivia Test </div>
@@ -87,15 +92,58 @@
 
         <div id="messages"></div>
 
-    </div>
+        <!--
+            <div id="main_video">
+                <div class="imageSub">
+                    <div class="blackbg" id="playerstatebg">IDLE</div>
+                    <div class=label id="playerstate">IDLE</div>
+                    <img src="images/bunny.jpg" id="video_image">
+                    <div id="video_image_overlay"></div>
+                    <video id="video_element">
+                    </video>
+                </div>
 
-    <!-- Compiled and minified JavaScript materialize -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/js/materialize.min.js"></script>
+                <div id="media_control">
+                    <div id="play"></div>
+                    <div id="pause"></div>
+                    <div id="progress_bg"></div>
+                    <div id="progress"></div>
+                    <div id="progress_indicator"></div>
+                    <div id="fullscreen_expand"></div>
+                    <div id="fullscreen_collapse"></div>
+                    <google-cast-launcher id="castbutton"></google-cast-launcher>
+                    <div id="audio_bg"></div>
+                    <div id="audio_bg_track"></div>
+                    <div id="audio_indicator"></div>
+                    <div id="audio_bg_level"></div>
+                    <div id="audio_on"></div>
+                    <div id="audio_off"></div>
+                    <div id="duration">00:00:00</div>
+                </div>
+            </div>
+    -->
+        <!-- Compiled and minified JavaScript materialize -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/js/materialize.min.js"></script>
 
-    <!-- multitouch.js -->
-    <script type="text/javascript" src="assets/javascript/multitouch.js"></script>
+        <!-- multitouch.js
+       <script type="text/javascript" src="assets/javascript/multitouch.js"></script>
+    -->
+        <!-- app -->
+        <script src="assets/javascript/car-controls.js"></script>
+        <script type="text/javascript" src="assets/javascript/clients.js"></script>
 
-    <!-- app.js -->
-    <script type="text/javascript" src="assets/javascript/clients.js"></script>
+        <!-- cast_sender.js
+    <script src="assets/javascript/CastVideos.js"></script>
+    <script type="text/javascript">
+        var castPlayer = new CastPlayer();
+        window['__onGCastApiAvailable'] = function (isAvailable) {
+            if (isAvailable) {
+                castPlayer.initializeCastPlayer();
+            }
+        };
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+    <!-- cast_sender.js -->
+
 </body>
 </html>

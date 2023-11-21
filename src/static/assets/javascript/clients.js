@@ -1,5 +1,6 @@
 var Gameroom = null;
 var Ourroom = null;
+var myId = null;
 
 class JoystickController {
     // stickID: ID of HTML element (representing joystick) that will be dragged
@@ -104,192 +105,384 @@ class JoystickController {
 
 let joystick1 = new JoystickController("stick1", 64, 8);
 
-var gameObject = {
-
-	gameRunning: 0,
-
-	add : function () {
-
-		//Create an input type dynamically.
-		var element = document.createElement("input");
-
-		//Create Labels
-		var label = document.createElement("Label");
-		label.innerHTML = "New Label";     
-
-		//Assign different attributes to the element.
-		element.setAttribute("type", "text");
-		element.setAttribute("value", "");
-		element.setAttribute("name", "msg");
-		element.setAttribute("style", "width:200px");
-
-		label.setAttribute("style", "font-weight:normal");
-	},
-
-	gotoLobby: function (client) {
-		$('.intro').addClass('hide');
-		document.getElementById('lobby').style.visibility = "visible";
-
-	//Join chat
-	client.joinOrCreate("chat").then(room => {
-		console.log("joined");
-		Ourroom = room;
-		console.log(room)
-		myId = room.sessionId
-		room.onStateChange.once(function (state) {
-			console.log("initial room state:", state);
-		});
-
-		// new room state
-		room.onStateChange(function (state) {
-			// this signal is triggered on each patch
-			console.log("room state changed:", state);
-		});
-
-		// listen to patches coming from the server
-		room.onMessage("messages", function (message) {
-			var p = document.createElement("p");
-			const modifiedMessage = message.replace(myId, document.getElementById('name').value)
-			p.innerText = modifiedMessage;
-			console.log(message)
-			document.querySelector("#messages").appendChild(p);
-		});
-
-		//handle send click event 
-		$('#sendMsgBtn').on( 'click', function (event){
-			// send data to room
-			var p = document.getElementById('sendMessage');
-			Ourroom.send("message", p.value);
-			// clear input
-			p.value = "";
-		});
-
-		//handle start click event
-        $('#startGameBtn').on('click', function (event) {
-            $('.intro-section').addClass('hide');
-            $('.lobby').addClass('hide');
-            document.getElementById('messages').style.visibility = "hidden";
-            //document.getElementById('controls').style.visibility = "visible";
-            document.getElementById('joystick').style.visibility = "visible";
-            //$('.full').addClass('show');
-            client.joinOrCreate("tenfoot").then(room_instance => {
-                Gameroom = room_instance
-            });
-		});
-	})
-        client.joinOrCreate("tenfoot").then(room_instance => {
-            Gameroom = room_instance
-        });
-	}
+controls = {
+    up: 0,
+    down: 0,
+    left: 0,
+    right: 0,
+    shoot: 0
 }
 
-var inputs = {
-    inputUp : 0,
-    inputDown : 0,
-    inputLeft : 0,
-    inputRight : 0,
-    inputFire : 0
+function circlesHit({ x: x1, y: y1, r: r1 }, { x: x2, y: y2, r: r2 }) {
+    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1)) < (r1 + r2);
 }
 
-var deadzone = 0;
+class gameObject {
 
-function update() {
-    //document.getElementById("status1").innerText = "Joystick 1: " + JSON.stringify(joystick1.value);
-    if (Gameroom !== null) {
-        if (joystick1.value.y === 0) {
-            if (inputs.inputDown === 1) {
-                inputs.inputDown = 0
+    gameRunning = 0;
+
+    constructor(client) {
+
+        //function gotoLobby()
+        {
+            $('.intro').addClass('hide');
+            document.getElementById('lobby').style.visibility = "visible";
+
+            //Join chat
+            client.joinOrCreate("chat").then(room => {
+                console.log("joined");
+                Ourroom = room;
+                console.log(room)
+                myId = room.sessionId
+                room.onStateChange.once(function (state) {
+                    console.log("initial room state:", state);
+                });
+
+                // new room state
+                room.onStateChange(function (state) {
+                    // this signal is triggered on each patch
+                    console.log("room state changed:", state);
+                });
+
+                // listen to patches coming from the server
+                room.onMessage("messages", function (message) {
+                    var p = document.createElement("p");
+                    const modifiedMessage = message.replace(myId, document.getElementById('name').value)
+                    p.innerText = modifiedMessage;
+                    console.log(message)
+                    document.querySelector("#messages").appendChild(p);
+                });
+
+                //handle send click event 
+                $('#sendMsgBtn').on('click', function (event) {
+                    // send data to room
+                    var p = document.getElementById('sendMessage');
+                    Ourroom.send("message", p.value);
+                    // clear input
+                    p.value = "";
+                });
+
+                //handle start click event
+                $('#startGameBtn').on('click', function (event) {
+                    $('.intro-section').addClass('hide');
+                    $('.lobby').addClass('hide');
+                    document.getElementById('messages').style.visibility = "hidden";
+                    //document.getElementById('controls').style.visibility = "visible";
+                    document.getElementById('joystick').style.visibility = "visible";
+                    //$('.full').addClass('show');
+                    localCar.name = document.getElementById('name').value;
+                    client.joinOrCreate("tenfoot").then(room_instance => {
+                        Gameroom = room_instance;
+                        sendParams(localCar);
+                    });
+                });
+            })
+        }
+
+        function add() {
+
+            //Create an input type dynamically.
+            var element = document.createElement("input");
+
+            //Create Labels
+            var label = document.createElement("Label");
+            label.innerHTML = "New Label";
+
+            //Assign different attributes to the element.
+            element.setAttribute("type", "text");
+            element.setAttribute("value", "");
+            element.setAttribute("name", "msg");
+            element.setAttribute("style", "width:200px");
+
+            label.setAttribute("style", "font-weight:normal");
+        }
+        function sendParams(car) {
+            if (Gameroom) {
                 Gameroom.send("move", {
-                    inputDown: -1
-                })
-            }
-            if (inputs.inputUp === 1) {
-                inputs.inputUp = 0
-                Gameroom.send("move", {
-                    inputUp: -1
-                })
-            }
-        }else
-            if (joystick1.value.y < -deadzone) {
-            if (inputs.inputUp === 0) {
-                inputs.inputUp = 1
-                Gameroom.send("move", {
-                    inputUp: 1
-                })
-            }
-            if (inputs.inputDown === 1) {
-                inputs.inputDown = 0
-                Gameroom.send("move", {
-                    inputDown: -1
-                })
-            }
-            } else if (joystick1.value.y > deadzone) {
-            if (inputs.inputDown === 0) {
-                inputs.inputDown = 1
-                Gameroom.send("move", {
-                    inputDown: 1
-                })
-            }
-            if (inputs.inputUp === 1) {
-                inputs.inputUp = 0
-                Gameroom.send("move", {
-                    inputUp: -1
-                })
+                    x: car.x,
+                    y: car.y,
+                    xVelocity: car.xVelocity,
+                    yVelocity: car.yVelocity,
+                    power: car.power,
+                    reverse: car.reverse,
+                    angle: car.angle,
+                    angularVelocity: car.angularVelocity,
+                    isThrottling: car.isThrottling,
+                    isReversing: car.isReversing,
+                    isShooting: car.isShooting,
+                    isTurningLeft: car.isTurningLeft,
+                    isTurningRight: car.isTurningRight,
+                    isHit: car.isHit,
+                    isShot: car.isShot,
+                    name: car.name,
+                    points: car.points
+                });
             }
         }
-        if (joystick1.value.x === 0) {
-            if (inputs.inputRight === 1) {
-                inputs.inputRight = 0
-                Gameroom.send("move", {
-                    inputRight: -1
-                })
+
+        const maxPower = 0.075;
+        const maxReverse = 0.0375;
+        const powerFactor = 0.001;
+        const reverseFactor = 0.0005;
+
+        const drag = 0.95;
+        const angularDrag = 0.95;
+        const turnSpeed = 0.002;
+
+        const WIDTH = 1000;
+        const HEIGHT = 1000;
+
+        const localCar = {
+            x: WIDTH / 2,
+            y: HEIGHT / 2,
+            xVelocity: 0,
+            yVelocity: 0,
+            power: 0,
+            reverse: 0,
+            angle: 0,
+            angularVelocity: 0,
+            isThrottling: 0,
+            isReversing: 0,
+            isShooting: 0,
+            isHit: 0,
+            isShot : 0,
+            name : 'anonymous',
+            points: 0
+        };
+
+        const scene = {
+            x: window.innerWidth / 2 - localCar.x,
+            y: window.innerHeight / 2 - localCar.y
+        };
+
+        const cars = [localCar];
+        const carsById = {};
+
+        const bullets = [];
+
+        function updateCar(car, i) {
+            if (car.isHit || car.isShot) {
+                if (car === localCar) {
+                    car.isHit = 0;
+                    car.isShot = 0;
+                    car.x = Math.random() * WIDTH;
+                    car.y = Math.random() * HEIGHT;
+                    car.xVelocity = 0;
+                    car.yVelocity = 0;
+                    sendParams(localCar);
+                }
             }
-            if (inputs.inputLeft === 1) {
-                inputs.inputLeft = 0
-                Gameroom.send("move", {
-                    inputLeft: -1
-                })
+
+            if (car.isThrottling) {
+                car.power += powerFactor * car.isThrottling;
+            } else {
+                car.power -= powerFactor;
             }
-        } else
-            if (joystick1.value.x < -deadzone) {
-            if (inputs.inputLeft === 0) {
-                inputs.inputLeft = 1
-                Gameroom.send("move", {
-                    inputLeft: 1
-                })
+            if (car.isReversing) {
+                car.reverse += reverseFactor;
+            } else {
+                car.reverse -= reverseFactor;
             }
-            if (inputs.inputRight === 1) {
-                inputs.inputRight = 0
-                Gameroom.send("move", {
-                    inputRight: -1
-                })
+
+            car.power = Math.max(0, Math.min(maxPower, car.power));
+            car.reverse = Math.max(0, Math.min(maxReverse, car.reverse));
+
+            const direction = car.power > car.reverse ? 1 : -1;
+
+            if (car.isTurningLeft) {
+                car.angularVelocity -= direction * turnSpeed * car.isTurningLeft;
             }
-            } else if (joystick1.value.x > deadzone) {
-            if (inputs.inputRight === 0) {
-                inputs.inputRight = 1
-                Gameroom.send("move", {
-                    inputRight: 1
-                })
+            if (car.isTurningRight) {
+                car.angularVelocity += direction * turnSpeed * car.isTurningRight;
             }
-            if (inputs.inputLeft === 1) {
-                inputs.inputLeft = 0
-                Gameroom.send("move", {
-                    inputLeft: -1
-                })
+
+            car.xVelocity += Math.sin(car.angle) * (car.power - car.reverse);
+            car.yVelocity += Math.cos(car.angle) * (car.power - car.reverse);
+
+            car.x += car.xVelocity;
+            car.y -= car.yVelocity;
+            car.xVelocity *= drag;
+            car.yVelocity *= drag;
+            car.angle += car.angularVelocity;
+            car.angularVelocity *= angularDrag;
+
+            if (car.isShooting && !car.isShot && !car.isHit) {
+                if (!car.lastShootAt || car.lastShootAt < Date.now() - 60) {
+                    car.lastShootAt = Date.now();
+                    const { x, y, angle, xVelocity, yVelocity } = car;
+                    bullets.push({
+                        local: car === localCar,
+                        x: x + Math.sin(angle) * 10,
+                        y: y - Math.cos(angle) * 10,
+                        angle,
+                        xVelocity: xVelocity + Math.sin(angle) * 1.25,
+                        yVelocity: yVelocity + Math.cos(angle) * 1.25,
+                        shootAt: Date.now()
+                    });
+                }
             }
         }
-    };
+
+        function update() {
+            cars.forEach(updateCar);
+
+            for (let i = 0; i < bullets.length; i++) {
+                const bullet = bullets[i];
+
+                bullet.x += bullet.xVelocity;
+                bullet.y -= bullet.yVelocity;
+            }
+        }
+
+        let lastTime;
+        let acc = 0;
+        const step = 1 / 120;
+
+        setInterval(() => {
+            let changed;
+
+            var keycontrols = window.getControls();
+            controls.up |= keycontrols.up;
+            controls.down |= keycontrols.down;
+            controls.left |= keycontrols.left;
+            controls.right |= keycontrols.right;
+            controls.shoot |= keycontrols.shoot;
+
+            const canTurn = localCar.power > 0.0025 || localCar.reverse;
+
+            const throttle = Math.round(controls.up * 10) / 10;
+            const reverse = Math.round(controls.down * 10) / 10;
+            const isShooting = controls.shoot;
+
+            if (isShooting !== localCar.isShooting) {
+                changed = true;
+                localCar.isShooting = isShooting;
+            }
+
+            if (localCar.isThrottling !== throttle || localCar.isReversing !== reverse) {
+                changed = true;
+                localCar.isThrottling = throttle;
+                localCar.isReversing = reverse;
+            }
+            const turnLeft = canTurn && Math.round(controls.left * 10) / 10;
+            const turnRight = canTurn && Math.round(controls.right * 10) / 10;
+
+            if (localCar.isTurningLeft !== turnLeft) {
+                changed = true;
+                localCar.isTurningLeft = turnLeft;
+            }
+            if (localCar.isTurningRight !== turnRight) {
+                changed = true;
+                localCar.isTurningRight = turnRight;
+            }
+
+            if (localCar.x > WIDTH + 7.5) {
+                localCar.x -= WIDTH + 15;
+                changed = true;
+            } else if (localCar.x < -7.5) {
+                localCar.x += WIDTH + 15;
+                changed = true;
+            }
+
+            if (localCar.y > HEIGHT + 7.5) {
+                localCar.y -= HEIGHT + 15;
+                changed = true;
+            } else if (localCar.y < -7.5) {
+                localCar.y += HEIGHT + 15;
+                changed = true;
+            }
+
+            for (let i = 0; i < cars.length; i++) {
+                const car = cars[i];
+
+                if (localCar === car) {
+                    continue;
+                }
+
+                if (car.isShot) {
+                    continue;
+                }
+
+                if (circlesHit({ x: car.x, y: car.y, r: 7.5 }, { x: localCar.x, y: localCar.y, r: 7.5 })) {
+                    localCar.isHit = true;
+                    changed = true;
+                }
+            }
+
+            for (let j = 0; j < cars.length; j++) {
+                const car = cars[j];
+
+                for (let i = 0; i < bullets.length; i++) {
+                    const bullet = bullets[i];
+
+                    if (bullet && circlesHit({ x: car.x, y: car.y, r: 7.5 }, { x: bullet.x, y: bullet.y, r: 2 })) {
+                        if (car !== localCar) {
+                            if (!car.isShot) {
+                                car.isShot = true;
+                                if (bullet.local) {
+                                    localCar.points++;
+                                }
+                                changed = true;
+                            }
+                            continue;
+                        }
+                        car.isShot = true;
+                        changed = true;
+                    }
+                }
+            }
+
+            const ms = Date.now();
+            if (lastTime) {
+                acc += (ms - lastTime) / 1000;
+
+                while (acc > step) {
+                    update();
+
+                    acc -= step;
+                }
+            }
+
+            lastTime = ms;
+
+            if (changed) {
+                sendParams(localCar);
+            }
+        }, 1000 / 120);
+    }
+}
+
+var deadzone = 0.1;
+
+function update(controls) {
+    if (joystick1.value.y < -deadzone) {
+        controls.up = 1;
+    } else if (joystick1.value.y > deadzone) {
+        controls.down = 1;
+    } else {
+        controls.up = 0;
+        controls.down = 0;
+    }
+    if (joystick1.value.x < -deadzone) {
+        controls.left = 1;
+    } else if (joystick1.value.x > deadzone) {
+        controls.right = 1;
+    } else {
+        controls.left = 0;
+        controls.right = 0;
+    }
+    controls.shoot = 0;
 }
 
 function loop() {
     requestAnimationFrame(loop);
-    update();
+    update(controls);
 }
 
 
 window.onload = function () {
 
-	document.getElementById('lobby').style.visibility = "hidden";
+    document.getElementById('lobby').style.visibility = "hidden";
     document.getElementById('joystick').style.visibility = "hidden";
     //document.getElementById('controls').style.visibility = "hidden";
     //$('.full').addClass('hide');
@@ -303,26 +496,25 @@ window.onload = function () {
     const serverWebsocketUrl = location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : ':2567/')
     */
 
-	var serverWebsocketUrl = "ws://192.168.1.179:2567/";
+    var serverWebsocketUrl = "ws://192.168.1.179:2567/";
 
     console.log(serverWebsocketUrl);
     var client = new Colyseus.Client(serverWebsocketUrl);
 
-	$('.tooltipped').tooltip({
-		delay: 50
-	});
+    $('.tooltipped').tooltip({
+        delay: 50
+    });
 
-	//after 3.5sec, add animation on startBtn
-	setTimeout ( function () {
-		$('#joinBtn').removeClass('bounceInUp').addClass('infinite pulse');
-	}, 3500);
+    //after 3.5sec, add animation on startBtn
+    setTimeout(function () {
+        $('#joinBtn').removeClass('bounceInUp').addClass('infinite pulse');
+    }, 3500);
 
-	//Join game
-	$('#joinBtn').on('click', function () {
-		let myId = null
+    //Join game
+    $('#joinBtn').on('click', function () {
 
-		gameObject.gotoLobby(client);
+        var game = new gameObject(client);
         loop();
-	});
+    });
 }
 
