@@ -41,10 +41,11 @@ var gameObject = {
             Gameroom.state.players.onAdd(function (player, sessionId) {
                 let car = carsById[sessionId];
 
-                if (Gameroom.sessionId != sessionId && car !== null)
+                if (Gameroom.sessionId != sessionId && car === undefined)
                 {
                     car = {
                         $el: null,
+                        sessionId: sessionId,
                         x: WIDTH / 2,
                         y: HEIGHT / 2,
                         xVelocity: 0,
@@ -86,6 +87,7 @@ var gameObject = {
                             console.log(change.field);
                             console.log(change.value);
                             console.log(change.previousValue);
+                            if (change.field === "sessionId") { car.sessionId = change.value; }
                             if (change.field === "x") { car.x = change.value; }
                             if (change.field === "y") { car.y = change.value; }
                             if (change.field === "xVelocity") { car.xVelocity = change.value; }
@@ -152,15 +154,12 @@ const drag = 0.95;
 const angularDrag = 0.95;
 const turnSpeed = 0.002;
 
-const WIDTH = 1000;
-const HEIGHT = 1000;
-
 const $canvas = document.querySelector('canvas');
 
-$canvas.width = WIDTH;
-$canvas.height = HEIGHT;
-
 const ctx = $canvas.getContext('2d');
+
+var WIDTH = window.innerWidth;
+var HEIGHT = window.innerHeight;
 
 ctx.fillStyle = 'hsla(0, 0%, 25%, 0.25)';
 
@@ -196,6 +195,45 @@ const scene = {
 
 cars = [];
 const carsById = {};
+
+function sendParams(car) {
+    if (Gameroom) {
+        Gameroom.send("move", {
+            sessionId: car.sessionId,
+            x: car.x,
+            y: car.y,
+            xVelocity: car.xVelocity,
+            yVelocity: car.yVelocity,
+            power: car.power,
+            reverse: car.reverse,
+            angle: car.angle,
+            angularVelocity: car.angularVelocity,
+            isThrottling: car.isThrottling,
+            isReversing: car.isReversing,
+            isShooting: car.isShooting,
+            isTurningLeft: car.isTurningLeft,
+            isTurningRight: car.isTurningRight,
+            isHit: car.isHit,
+            isShot: car.isShot,
+            name: car.name,
+            points: car.points
+        });
+    }
+}
+
+function resizeHandler() {
+    for (let j = 0; j < cars.length; j++) {
+        const car = cars[j];
+        car.x = (car.x * window.innerWidth) / WIDTH;
+        car.y = (car.y * window.innerHeight) / HEIGHT;
+        sendParams(car);
+    }
+    WIDTH = window.innerWidth;
+    HEIGHT = window.innerHeight;
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+    console.log("size changed:", WIDTH, HEIGHT);
+}
 
 if (window.location.search === '?test') {
     cars.push({ ...localCar });
@@ -283,7 +321,7 @@ function applyInputs(car, i){
         }
 
         if (circlesHit({ x: car2.x, y: car2.y, r: 7.5 }, { x: car.x, y: car.y, r: 7.5 })) {
-            car.isHit = true;
+            //car.isHit = 1;
             changed = true;
         }
     }
@@ -297,7 +335,7 @@ function applyInputs(car, i){
             if (bullet && circlesHit({ x: car2.x, y: car2.y, r: 7.5 }, { x: bullet.x, y: bullet.y, r: 2 })) {
                 if (car2 !== car) {
                     if (!car2.isShot) {
-                        car2.isShot = true;
+                        //car2.isShot = 1;
                         if (bullet.local) {
                             car.points++;
                         }
@@ -305,7 +343,7 @@ function applyInputs(car, i){
                     }
                     continue;
                 }
-                car2.isShot = true;
+                //car2.isShot = 1;
                 changed = true;
             }
         }
@@ -458,10 +496,19 @@ requestAnimationFrame(render);
 
 window.onload = function () {
 
-    var serverWebsocketUrl = "ws://192.168.1.179:2567/";
+    host = window.document.location.host.replace(/:.*/, '');
+    console.log(host)
+    const serverWebsocketUrl = location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : ':2567/')
+
+    //var serverWebsocketUrl = "ws://68.183.196.183:2567/";
 
     console.log(serverWebsocketUrl);
     var client = new Colyseus.Client(serverWebsocketUrl);
 
     gameObject.join(client);
 }
+
+window.addEventListener('resize', function (event) {
+    resizeHandler();
+}, true);
+

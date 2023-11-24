@@ -46,13 +46,16 @@
         <hr>
     -->
         <div id="joystick"
-            <div style="border: 1px solid red; width: 128px; position: absolute; left:10px; top:150px;">
+            <div style="border: 1px solid red; width: 128px; position: absolute; left:10%; top:10%; visibility: hidden">
                 <img src="assets/images/joystick-base.png" />
-                <div id="stick1" style="position: absolute; left:32px; top:32px;">
+                <div id="stick1" style="position: absolute; left:32px; top:32px; visibility: hidden">
                     <img src="assets/images/joystick-red.png" />
                 </div>
-                </div>
             </div>
+            </div>
+        <div id="button" style="position: absolute; right:10%; top:10%; visibility: hidden">
+            <img src="assets/images/joystick-red.png" />
+        </div>
 
         <!--
                <div class="full">
@@ -76,7 +79,7 @@
         </div>
 
         <!-- Lobby Section -->
-        <div class="container-fluid text-center lobby-section" id='lobby'>
+        <div class="container-fluid text-center lobby-section" id='lobby' style="visibility: hidden">
             <div class="row lobby">
                 <div class="col-sm-12 text-center">
                     <h3 class="animated fadeIn">
@@ -93,17 +96,17 @@
         <div id="messages"></div>
 
         <!-- -->
-        <div id="main_video">
+        <div id="main_video" style="visibility: hidden">
             <div class="imageSub">
                 <div class="blackbg" id="playerstatebg">IDLE</div>
                 <div class=label id="playerstate">IDLE</div>
-                <img src="images/bunny.jpg" id="video_image">
+                <img src="" id="video_image">
                 <div id="video_image_overlay"></div>
                 <video id="video_element">
                 </video>
             </div>
 
-            <div id="media_control">
+            <div id="media_control" style="visibility: hidden">
                 <div id="play"></div>
                 <div id="pause"></div>
                 <div id="progress_bg"></div>
@@ -111,7 +114,7 @@
                 <div id="progress_indicator"></div>
                 <div id="fullscreen_expand"></div>
                 <div id="fullscreen_collapse"></div>
-                <google-cast-launcher id="castbutton"></google-cast-launcher>
+                <google-cast-launcher id="castbutton" ></google-cast-launcher>
                 <div id="audio_bg"></div>
                 <div id="audio_bg_track"></div>
                 <div id="audio_indicator"></div>

@@ -60,7 +60,7 @@ var PLAYER_STATE = {
  *  - Current media variables for transition between Cast and local modes
  * @struct @constructor
  */
-var CastPlayer = function() {
+var CastPlayer = function () {
     /** @type {PlayerHandler} Delegation proxy for media playback */
     this.playerHandler = new PlayerHandler(this);
 
@@ -97,7 +97,7 @@ var CastPlayer = function() {
     this.initializeUI();
 };
 
-CastPlayer.prototype.initializeCastPlayer = function() {
+CastPlayer.prototype.initializeCastPlayer = function () {
 
     var options = {};
 
@@ -130,7 +130,7 @@ CastPlayer.prototype.initializeCastPlayer = function() {
  * PlayerHandler and setup functions
  */
 
-CastPlayer.prototype.switchPlayer = function() {
+CastPlayer.prototype.switchPlayer = function () {
     this.stopProgressTimer();
     this.resetVolumeSlider();
     this.playerHandler.stop();
@@ -171,14 +171,14 @@ CastPlayer.prototype.switchPlayer = function() {
  *  - isMuted()
  *  - updateDisplayMessage()
  */
-var PlayerHandler = function(castPlayer) {
+var PlayerHandler = function (castPlayer) {
     this.target = {};
 
-    this.setTarget= function(target) {
+    this.setTarget = function (target) {
         this.target = target;
     };
 
-    this.play = function() {
+    this.play = function () {
         if (castPlayer.playerState !== PLAYER_STATE.PLAYING &&
             castPlayer.playerState !== PLAYER_STATE.PAUSED &&
             castPlayer.playerState !== PLAYER_STATE.LOADED) {
@@ -193,7 +193,7 @@ var PlayerHandler = function(castPlayer) {
         this.updateDisplayMessage();
     };
 
-    this.pause = function() {
+    this.pause = function () {
         if (castPlayer.playerState !== PLAYER_STATE.PLAYING) {
             return;
         }
@@ -205,27 +205,27 @@ var PlayerHandler = function(castPlayer) {
         this.updateDisplayMessage();
     };
 
-    this.stop = function() {
+    this.stop = function () {
         this.pause();
         castPlayer.playerState = PLAYER_STATE.STOPPED;
         this.updateDisplayMessage();
     };
 
-    this.load = function(mediaIndex) {
+    this.load = function (mediaIndex) {
         castPlayer.playerState = PLAYER_STATE.LOADING;
 
-        document.getElementById('media_title').innerHTML =
+        /*document.getElementById('media_title').innerHTML =
             castPlayer.mediaContents[castPlayer.currentMediaIndex]['title'];
         document.getElementById('media_subtitle').innerHTML =
             castPlayer.mediaContents[castPlayer.currentMediaIndex]['subtitle'];
         document.getElementById('media_desc').innerHTML =
             castPlayer.mediaContents[castPlayer.currentMediaIndex]['description'];
-
+            */
         this.target.load(mediaIndex);
         this.updateDisplayMessage();
     };
 
-    this.loaded = function() {
+    this.loaded = function () {
         castPlayer.currentMediaDuration = this.getMediaDuration();
         castPlayer.updateMediaDuration();
         castPlayer.playerState = PLAYER_STATE.LOADED;
@@ -237,39 +237,39 @@ var PlayerHandler = function(castPlayer) {
         this.updateDisplayMessage();
     };
 
-    this.getCurrentMediaTime = function() {
+    this.getCurrentMediaTime = function () {
         return this.target.getCurrentMediaTime();
     };
 
-    this.getMediaDuration = function() {
+    this.getMediaDuration = function () {
         return this.target.getMediaDuration();
     };
 
     this.updateDisplayMessage = function () {
         this.target.updateDisplayMessage();
     }
-;
-    this.setVolume = function(volumeSliderPosition) {
+        ;
+    this.setVolume = function (volumeSliderPosition) {
         this.target.setVolume(volumeSliderPosition);
     };
 
-    this.mute = function() {
+    this.mute = function () {
         this.target.mute();
         document.getElementById('audio_on').style.display = 'none';
         document.getElementById('audio_off').style.display = 'block';
     };
 
-    this.unMute = function() {
+    this.unMute = function () {
         this.target.unMute();
         document.getElementById('audio_on').style.display = 'block';
         document.getElementById('audio_off').style.display = 'none';
     };
 
-    this.isMuted = function() {
+    this.isMuted = function () {
         return this.target.isMuted();
     };
 
-    this.seekTo = function(time) {
+    this.seekTo = function (time) {
         this.target.seekTo(time);
         this.updateDisplayMessage();
     };
@@ -286,7 +286,7 @@ CastPlayer.prototype.setupLocalPlayer = function () {
     // This object will implement PlayerHandler callbacks with localPlayer
     var playerTarget = {};
 
-    playerTarget.play = function() {
+    playerTarget.play = function () {
         localPlayer.play();
 
         var vi = document.getElementById('video_image');
@@ -302,47 +302,51 @@ CastPlayer.prototype.setupLocalPlayer = function () {
         localPlayer.stop();
     };
 
-    playerTarget.load = function(mediaIndex) {
+    playerTarget.load = function (mediaIndex) {
         localPlayer.src =
             this.mediaContents[mediaIndex]['sources'][0];
         localPlayer.load();
     }.bind(this);
 
-    playerTarget.getCurrentMediaTime = function() {
+    playerTarget.getCurrentMediaTime = function () {
         return localPlayer.currentTime;
     };
 
-    playerTarget.getMediaDuration = function() {
+    playerTarget.getMediaDuration = function () {
         return localPlayer.duration;
     };
 
     playerTarget.updateDisplayMessage = function () {
+        /*
         document.getElementById('playerstate').style.display = 'none';
         document.getElementById('playerstatebg').style.display = 'none';
         document.getElementById('video_image_overlay').style.display = 'none';
+        */
     };
 
-    playerTarget.setVolume = function(volumeSliderPosition) {
+    playerTarget.setVolume = function (volumeSliderPosition) {
+        /*
         localPlayer.volume = volumeSliderPosition < FULL_VOLUME_HEIGHT ?
             volumeSliderPosition / FULL_VOLUME_HEIGHT : 1;
         var p = document.getElementById('audio_bg_level');
         p.style.height = volumeSliderPosition + 'px';
         p.style.marginTop = -volumeSliderPosition + 'px';
+        */
     };
 
-    playerTarget.mute = function() {
+    playerTarget.mute = function () {
         localPlayer.muted = true;
     };
 
-    playerTarget.unMute = function() {
+    playerTarget.unMute = function () {
         localPlayer.muted = false;
     };
 
-    playerTarget.isMuted = function() {
+    playerTarget.isMuted = function () {
         return localPlayer.muted;
     };
 
-    playerTarget.seekTo = function(time) {
+    playerTarget.seekTo = function (time) {
         localPlayer.currentTime = time;
     };
 
@@ -366,7 +370,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
     // Add event listeners for player changes which may occur outside sender app
     this.remotePlayerController.addEventListener(
         cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED,
-        function() {
+        function () {
             if (this.remotePlayer.isPaused) {
                 this.playerHandler.pause();
             } else {
@@ -377,7 +381,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
 
     this.remotePlayerController.addEventListener(
         cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED,
-        function() {
+        function () {
             if (this.remotePlayer.isMuted) {
                 this.playerHandler.mute();
             } else {
@@ -388,7 +392,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
 
     this.remotePlayerController.addEventListener(
         cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED,
-        function() {
+        function () {
             var newVolume = this.remotePlayer.volumeLevel * FULL_VOLUME_HEIGHT;
             var p = document.getElementById('audio_bg_level');
             p.style.height = newVolume + 'px';
@@ -419,7 +423,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
     }.bind(this);
 
     playerTarget.stop = function () {
-         this.remotePlayerController.stop();
+        this.remotePlayerController.stop();
     }.bind(this);
 
     playerTarget.load = function (mediaIndex) {
@@ -431,7 +435,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
         mediaInfo.metadata.metadataType = chrome.cast.media.MetadataType.GENERIC;
         mediaInfo.metadata.title = this.mediaContents[mediaIndex]['title'];
         mediaInfo.metadata.images = [
-            {'url': MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]['thumb']}];
+            { 'url': MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]['thumb'] }];
 
         var request = new chrome.cast.media.LoadRequest(mediaInfo);
         request.credentials = 'user-credentials';
@@ -445,21 +449,23 @@ CastPlayer.prototype.setupRemotePlayer = function () {
             }.bind(this));
     }.bind(this);
 
-    playerTarget.getCurrentMediaTime = function() {
+    playerTarget.getCurrentMediaTime = function () {
         return this.remotePlayer.currentTime;
     }.bind(this);
 
-    playerTarget.getMediaDuration = function() {
+    playerTarget.getMediaDuration = function () {
         return this.remotePlayer.duration;
     }.bind(this);
 
     playerTarget.updateDisplayMessage = function () {
+        /*
         document.getElementById('playerstate').style.display = 'block';
         document.getElementById('playerstatebg').style.display = 'block';
         document.getElementById('video_image_overlay').style.display = 'block';
         document.getElementById('playerstate').innerHTML =
-            this.mediaContents[ this.currentMediaIndex]['title'] + ' ' +
+            this.mediaContents[this.currentMediaIndex]['title'] + ' ' +
             this.playerState + ' on ' + castSession.getCastDevice().friendlyName;
+            */
     }.bind(this);
 
     playerTarget.setVolume = function (volumeSliderPosition) {
@@ -467,7 +473,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
         var currentVolume = this.remotePlayer.volumeLevel;
         var p = document.getElementById('audio_bg_level');
         if (volumeSliderPosition < FULL_VOLUME_HEIGHT) {
-            var vScale =  this.currentVolume * FULL_VOLUME_HEIGHT;
+            var vScale = this.currentVolume * FULL_VOLUME_HEIGHT;
             if (volumeSliderPosition > vScale) {
                 volumeSliderPosition = vScale + (pos - vScale) / 2;
             }
@@ -493,7 +499,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
         }
     }.bind(this);
 
-    playerTarget.isMuted = function() {
+    playerTarget.isMuted = function () {
         return this.remotePlayer.isMuted;
     }.bind(this);
 
@@ -509,11 +515,12 @@ CastPlayer.prototype.setupRemotePlayer = function () {
     if (this.remotePlayer.isMuted) {
         this.playerHandler.mute();
     }
+    /*
     var currentVolume = this.remotePlayer.volumeLevel * FULL_VOLUME_HEIGHT;
     var p = document.getElementById('audio_bg_level');
     p.style.height = currentVolume + 'px';
     p.style.marginTop = -currentVolume + 'px';
-
+    */
     this.hideFullscreenButton();
 
     this.playerHandler.play();
@@ -522,7 +529,7 @@ CastPlayer.prototype.setupRemotePlayer = function () {
 /**
  * Callback when media is loaded in local player
  */
-CastPlayer.prototype.onMediaLoadedLocally = function() {
+CastPlayer.prototype.onMediaLoadedLocally = function () {
     var localPlayer = document.getElementById('video_element');
     localPlayer.currentTime = this.currentMediaTime;
 
@@ -533,11 +540,12 @@ CastPlayer.prototype.onMediaLoadedLocally = function() {
  * Select a media content
  * @param {number} mediaIndex A number for media index
  */
-CastPlayer.prototype.selectMedia = function(mediaIndex) {
+CastPlayer.prototype.selectMedia = function (mediaIndex) {
     console.log('Media index selected: ' + mediaIndex);
 
     this.currentMediaIndex = mediaIndex;
 
+    /*
     // Set video image
     var vi = document.getElementById('video_image');
     vi.src = MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]['thumb'];
@@ -547,6 +555,7 @@ CastPlayer.prototype.selectMedia = function(mediaIndex) {
     var p = document.getElementById('progress');
     p.style.width = '0px';
     pi.style.marginLeft = -21 - PROGRESS_BAR_WIDTH + 'px';
+    */
 
     // Reset currentMediaTime
     this.currentMediaTime = 0;
@@ -559,7 +568,8 @@ CastPlayer.prototype.selectMedia = function(mediaIndex) {
  * Media seek function
  * @param {Event} event An event object from seek
  */
-CastPlayer.prototype.seekMedia = function(event) {
+CastPlayer.prototype.seekMedia = function (event) {
+    /*
     var pos = parseInt(event.offsetX, 10);
     var pi = document.getElementById('progress_indicator');
     var p = document.getElementById('progress');
@@ -584,13 +594,15 @@ CastPlayer.prototype.seekMedia = function(event) {
     }
 
     this.playerHandler.seekTo(curr);
+    */
 };
 
 /**
  * Set current player volume
  * @param {Event} mouseEvent
  */
-CastPlayer.prototype.setVolume = function(mouseEvent) {
+CastPlayer.prototype.setVolume = function (mouseEvent) {
+    /*
     var p = document.getElementById('audio_bg_level');
     var pos = 0;
     if (mouseEvent.currentTarget.id === 'audio_bg_track') {
@@ -599,12 +611,13 @@ CastPlayer.prototype.setVolume = function(mouseEvent) {
         pos = parseInt(p.clientHeight, 10) - parseInt(mouseEvent.offsetY, 10);
     }
     this.playerHandler.setVolume(pos);
+    */
 };
 
 /**
  * Starts the timer to increment the media progress bar
  */
-CastPlayer.prototype.startProgressTimer = function() {
+CastPlayer.prototype.startProgressTimer = function () {
     this.stopProgressTimer();
 
     // Start progress timer
@@ -615,7 +628,7 @@ CastPlayer.prototype.startProgressTimer = function() {
 /**
  * Stops the timer to increment the media progress bar
  */
-CastPlayer.prototype.stopProgressTimer = function() {
+CastPlayer.prototype.stopProgressTimer = function () {
     if (this.timer) {
         clearInterval(this.timer);
         this.timer = null;
@@ -626,7 +639,7 @@ CastPlayer.prototype.stopProgressTimer = function() {
  * Helper function
  * Increment media current position by 1 second
  */
-CastPlayer.prototype.incrementMediaTime = function() {
+CastPlayer.prototype.incrementMediaTime = function () {
     // First sync with the current player's time
     this.currentMediaTime = this.playerHandler.getCurrentMediaTime();
     this.currentMediaDuration = this.playerHandler.getMediaDuration();
@@ -644,7 +657,8 @@ CastPlayer.prototype.incrementMediaTime = function() {
 /**
  * Update progress bar based on timer
  */
-CastPlayer.prototype.updateProgressBarByTimer = function() {
+CastPlayer.prototype.updateProgressBarByTimer = function () {
+    /*
     var p = document.getElementById('progress');
     if (isNaN(parseInt(p.style.width, 10))) {
         p.style.width = 0;
@@ -660,27 +674,29 @@ CastPlayer.prototype.updateProgressBarByTimer = function() {
 
     if (pp >= PROGRESS_BAR_WIDTH) {
         this.endPlayback();
-    }
+    }*/
 };
 
 /**
  *  End playback. Called when media ends.
  */
-CastPlayer.prototype.endPlayback = function() {
+CastPlayer.prototype.endPlayback = function () {
     this.currentMediaTime = 0;
     this.stopProgressTimer();
     this.playerState = PLAYER_STATE.IDLE;
     this.playerHandler.updateDisplayMessage();
 
+    /*
     document.getElementById('play').style.display = 'block';
     document.getElementById('pause').style.display = 'none';
+    */
 };
 
 /**
  * @param {number} durationInSec
  * @return {string}
  */
-CastPlayer.getDurationString = function(durationInSec) {
+CastPlayer.getDurationString = function (durationInSec) {
     var durationString = '' + Math.floor(durationInSec % 60);
     var durationInMin = Math.floor(durationInSec / 60);
     if (durationInMin === 0) {
@@ -697,15 +713,16 @@ CastPlayer.getDurationString = function(durationInSec) {
 /**
  * Updates media duration text in UI
  */
-CastPlayer.prototype.updateMediaDuration = function() {
-    document.getElementById('duration').innerHTML =
-        CastPlayer.getDurationString(this.currentMediaDuration);
+CastPlayer.prototype.updateMediaDuration = function () {
+    /*document.getElementById('duration').innerHTML =
+    CastPlayer.getDurationString(this.currentMediaDuration);
+    */
 };
 
 /**
  * Request full screen mode
  */
-CastPlayer.prototype.requestFullScreen = function() {
+CastPlayer.prototype.requestFullScreen = function () {
     // Supports most browsers and their versions.
     var element = document.getElementById('video_element');
     var requestMethod =
@@ -720,7 +737,7 @@ CastPlayer.prototype.requestFullScreen = function() {
 /**
  * Exit full screen mode
  */
-CastPlayer.prototype.cancelFullScreen = function() {
+CastPlayer.prototype.cancelFullScreen = function () {
     // Supports most browsers and their versions.
     var requestMethod =
         document['cancelFullScreen'] || document['webkitCancelFullScreen'];
@@ -734,7 +751,7 @@ CastPlayer.prototype.cancelFullScreen = function() {
 /**
  * Exit fullscreen mode by escape
  */
-CastPlayer.prototype.fullscreenChangeHandler = function() {
+CastPlayer.prototype.fullscreenChangeHandler = function () {
     this.fullscreen = !this.fullscreen;
 };
 
@@ -742,73 +759,82 @@ CastPlayer.prototype.fullscreenChangeHandler = function() {
 /**
  * Show expand/collapse fullscreen button
  */
-CastPlayer.prototype.showFullscreenButton = function() {
+CastPlayer.prototype.showFullscreenButton = function () {
+    /*
     if (this.fullscreen) {
         document.getElementById('fullscreen_expand').style.display = 'none';
         document.getElementById('fullscreen_collapse').style.display = 'block';
     } else {
         document.getElementById('fullscreen_expand').style.display = 'block';
         document.getElementById('fullscreen_collapse').style.display = 'none';
-    }
+    }*/
 };
 
 
 /**
  * Hide expand/collapse fullscreen button
  */
-CastPlayer.prototype.hideFullscreenButton = function() {
+CastPlayer.prototype.hideFullscreenButton = function () {
+    /*
     document.getElementById('fullscreen_expand').style.display = 'none';
     document.getElementById('fullscreen_collapse').style.display = 'none';
+    */
 };
 
 /**
  * Show the media control
  */
-CastPlayer.prototype.showMediaControl = function() {
-    document.getElementById('media_control').style.opacity = 0.7;
+CastPlayer.prototype.showMediaControl = function () {
+    //document.getElementById('media_control').style.opacity = 0.7;
 };
 
 
 /**
  * Hide the media control
  */
-CastPlayer.prototype.hideMediaControl = function() {
-    document.getElementById('media_control').style.opacity = 0;
+CastPlayer.prototype.hideMediaControl = function () {
+    //document.getElementById('media_control').style.opacity = 0;
 };
 
 
 /**
  * Show the volume slider
  */
-CastPlayer.prototype.showVolumeSlider = function() {
+CastPlayer.prototype.showVolumeSlider = function () {
+    /*
     if (!this.playerHandler.isMuted()) {
         document.getElementById('audio_bg').style.opacity = 1;
         document.getElementById('audio_bg_track').style.opacity = 1;
         document.getElementById('audio_bg_level').style.opacity = 1;
         document.getElementById('audio_indicator').style.opacity = 1;
     }
+    */
 };
 
 /**
  * Hide the volume slider
  */
-CastPlayer.prototype.hideVolumeSlider = function() {
+CastPlayer.prototype.hideVolumeSlider = function () {
+    /*
     document.getElementById('audio_bg').style.opacity = 0;
     document.getElementById('audio_bg_track').style.opacity = 0;
     document.getElementById('audio_bg_level').style.opacity = 0;
     document.getElementById('audio_indicator').style.opacity = 0;
+    */
 };
 
 /**
  * Reset the volume slider
  */
-CastPlayer.prototype.resetVolumeSlider = function() {
+CastPlayer.prototype.resetVolumeSlider = function () {
+    /*
     var volumeTrackHeight = document.getElementById('audio_bg_track').clientHeight;
     var defaultVolumeSliderHeight = DEFAULT_VOLUME * volumeTrackHeight;
     document.getElementById('audio_bg_level').style.height =
         defaultVolumeSliderHeight + 'px';
     document.getElementById('audio_on').style.display = 'block';
     document.getElementById('audio_off').style.display = 'none';
+    */
 };
 
 /**
@@ -830,7 +856,7 @@ CastPlayer.prototype.initializeUI = function () {
     document.getElementById('progress').addEventListener(
         'click', this.seekMedia.bind(this));
     document.getElementById('progress_indicator').addEventListener(
-       'dragend', this.seekMedia.bind(this));
+        'dragend', this.seekMedia.bind(this));
     document.getElementById('audio_on').addEventListener(
         'click', this.playerHandler.mute.bind(this.playerHandler));
     document.getElementById('audio_off').addEventListener(
@@ -881,9 +907,8 @@ CastPlayer.prototype.initializeUI = function () {
  * Add video thumbnails div's to UI for media JSON contents
  */
 CastPlayer.prototype.addVideoThumbs = function () {
-    /*
     this.mediaContents = mediaJSON['categories'][0]['videos'];
-    var ni = document.getElementById('carousel');
+    /*var ni = document.getElementById('carousel');
     var newdiv = null;
     var divIdName = null;
     for (var i = 0; i < this.mediaContents.length; i++) {
@@ -896,8 +921,7 @@ CastPlayer.prototype.addVideoThumbs = function () {
             '" class="thumbnail">';
         newdiv.addEventListener('click', this.selectMedia.bind(this, i));
         ni.appendChild(newdiv);
-    }
-    */
+    }*/
 };
 
 /**
@@ -905,7 +929,7 @@ CastPlayer.prototype.addVideoThumbs = function () {
  * @param {chrome.cast.Error} error
  * @return {string} error message
  */
-CastPlayer.getErrorMessage = function(error) {
+CastPlayer.getErrorMessage = function (error) {
     switch (error.code) {
         case chrome.cast.ErrorCode.API_NOT_INITIALIZED:
             return 'The API is not initialized.' +
@@ -937,84 +961,104 @@ CastPlayer.getErrorMessage = function(error) {
 /**
  * Hardcoded media json objects
  */
-var mediaJSON = { 'categories' : [{ 'name' : 'Movies',
-    'videos' : [
-        { 'description' : "Big Buck Bunny tells the story of a giant rabbit with a heart bigger than himself. When one sunny day three rodents rudely harass him, something snaps... and the rabbit ain't no bunny anymore! In the typical cartoon tradition he prepares the nasty rodents a comical revenge.\n\nLicensed under the Creative Commons Attribution license\nhttp://www.bigbuckbunny.org",
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'],
-            'subtitle' : 'By Blender Foundation',
-            'thumb' : 'images/BigBuckBunny.jpg',
-            'title' : 'Big Buck Bunny'
-        },
-        { 'description' : 'The first Blender Open Movie from 2006',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'],
-            'subtitle' : 'By Blender Foundation',
-            'thumb' : 'images/ElephantsDream.jpg',
-            'title' : 'Elephant Dream'
-        },
-        { 'description' : 'HBO GO now works with Chromecast -- the easiest way to enjoy online video on your TV. For when you want to settle into your Iron Throne to watch the latest episodes. For $35.\nLearn how to use Chromecast with HBO GO and more at google.com/chromecast.',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'],
-            'subtitle' : 'By Google',
-            'thumb' : 'images/ForBiggerBlazes.jpg',
-            'title' : 'For Bigger Blazes'
-        },
-        { 'description' : "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For when Batman's escapes aren't quite big enough. For $35. Learn how to use Chromecast with Google Play Movies and more at google.com/chromecast.",
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'],
-            'subtitle' : 'By Google',
-            'thumb' : 'images/ForBiggerEscapes.jpg',
-            'title' : 'For Bigger Escape'
-        },
-        { 'description' : 'Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For $35.  Find out more at google.com/chromecast.',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'],
-            'subtitle' : 'By Google',
-            'thumb' : 'images/ForBiggerFun.jpg',
-            'title' : 'For Bigger Fun'
-        },
-        { 'description' : 'Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For the times that call for bigger joyrides. For $35. Learn how to use Chromecast with YouTube and more at google.com/chromecast.',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'],
-            'subtitle' : 'By Google',
-            'thumb' : 'images/ForBiggerJoyrides.jpg',
-            'title' : 'For Bigger Joyrides'
-        },
-        { 'description' : "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For when you want to make Buster's big meltdowns even bigger. For $35. Learn how to use Chromecast with Netflix and more at google.com/chromecast.",
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'],
-            'subtitle' : 'By Google',
-            'thumb' : 'images/ForBiggerMeltdowns.jpg',
-            'title' : 'For Bigger Meltdowns'
-        },
-        { 'description' : 'Sintel is an independently produced short film, initiated by the Blender Foundation as a means to further improve and validate the free/open source 3D creation suite Blender. With initial funding provided by 1000s of donations via the internet community, it has again proven to be a viable development model for both open 3D technology as for independent animation film.\nThis 15 minute film has been realized in the studio of the Amsterdam Blender Institute, by an international team of artists and developers. In addition to that, several crucial technical and creative targets have been realized online, by developers and artists and teams all over the world.\nwww.sintel.org',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'],
-            'subtitle' : 'By Blender Foundation',
-            'thumb' : 'images/Sintel.jpg',
-            'title' : 'Sintel'
-        },
-        { 'description' : 'Smoking Tire takes the all-new Subaru Outback to the highest point we can find in hopes our customer-appreciation Balloon Launch will get some free T-shirts into the hands of our viewers.',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4'],
-            'subtitle' : 'By Garage419',
-            'thumb' : 'images/SubaruOutbackOnStreetAndDirt.jpg',
-            'title' : 'Subaru Outback On Street And Dirt'
-        },
-        { 'description' : 'Tears of Steel was realized with crowd-funding by users of the open source 3D creation tool Blender. Target was to improve and test a complete open and free pipeline for visual effects in film - and to make a compelling sci-fi film in Amsterdam, the Netherlands.  The film itself, and all raw material used for making it, have been released under the Creatieve Commons 3.0 Attribution license. Visit the tearsofsteel.org website to find out more about this, or to purchase the 4-DVD box with a lot of extras.  (CC) Blender Foundation - http://www.tearsofsteel.org',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'],
-            'subtitle' : 'By Blender Foundation',
-            'thumb' : 'images/TearsOfSteel.jpg',
-            'title' : 'Tears of Steel'
-        },
-        { 'description' : "The Smoking Tire heads out to Adams Motorsports Park in Riverside, CA to test the most requested car of 2010, the Volkswagen GTI. Will it beat the Mazdaspeed3's standard-setting lap time? Watch and see...",
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4'],
-            'subtitle' : 'By Garage419',
-            'thumb' : 'images/VolkswagenGTIReview.jpg',
-            'title' : 'Volkswagen GTI Review'
-        },
-        { 'description' : 'The Smoking Tire is going on the 2010 Bullrun Live Rally in a 2011 Shelby GT500, and posting a video from the road every single day! The only place to watch them is by subscribing to The Smoking Tire or watching at BlackMagicShine.com',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4'],
-            'subtitle' : 'By Garage419',
-            'thumb' : 'images/WeAreGoingOnBullrun.jpg',
-            'title' : 'We Are Going On Bullrun'
-        },
-        { 'description' : 'The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car. The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car.',
-            'sources' : ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4'],
-            'subtitle' : 'By Garage419',
-            'thumb' : 'images/WhatCarCanYouGetForAGrand.jpg',
-            'title' : 'What care can you get for a grand?'
-        }
-    ]}]};
+var mediaJSON = {
+    'categories': [{
+        'name': 'Movies',
+        'videos': [
+            {
+                'description': "Big Buck Bunny tells the story of a giant rabbit with a heart bigger than himself. When one sunny day three rodents rudely harass him, something snaps... and the rabbit ain't no bunny anymore! In the typical cartoon tradition he prepares the nasty rodents a comical revenge.\n\nLicensed under the Creative Commons Attribution license\nhttp://www.bigbuckbunny.org",
+                /*'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4'],
+                 */
+                'sources': ['http://68.183.196.183/web/vid/BigBuckBunny.mp4'],
+                /*'sources': ['http://192.168.1.179:1234'],*/
+                'subtitle': 'By Blender Foundation',
+                'thumb': 'images/BigBuckBunny.jpg',
+                'title': 'Big Buck Bunny'
+            },
+            {
+                'description': 'The first Blender Open Movie from 2006',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'],
+                'subtitle': 'By Blender Foundation',
+                'thumb': 'images/ElephantsDream.jpg',
+                'title': 'Elephant Dream'
+            },
+            {
+                'description': 'HBO GO now works with Chromecast -- the easiest way to enjoy online video on your TV. For when you want to settle into your Iron Throne to watch the latest episodes. For $35.\nLearn how to use Chromecast with HBO GO and more at google.com/chromecast.',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'],
+                'subtitle': 'By Google',
+                'thumb': 'images/ForBiggerBlazes.jpg',
+                'title': 'For Bigger Blazes'
+            },
+            {
+                'description': "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For when Batman's escapes aren't quite big enough. For $35. Learn how to use Chromecast with Google Play Movies and more at google.com/chromecast.",
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4'],
+                'subtitle': 'By Google',
+                'thumb': 'images/ForBiggerEscapes.jpg',
+                'title': 'For Bigger Escape'
+            },
+            {
+                'description': 'Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For $35.  Find out more at google.com/chromecast.',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'],
+                'subtitle': 'By Google',
+                'thumb': 'images/ForBiggerFun.jpg',
+                'title': 'For Bigger Fun'
+            },
+            {
+                'description': 'Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For the times that call for bigger joyrides. For $35. Learn how to use Chromecast with YouTube and more at google.com/chromecast.',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4'],
+                'subtitle': 'By Google',
+                'thumb': 'images/ForBiggerJoyrides.jpg',
+                'title': 'For Bigger Joyrides'
+            },
+            {
+                'description': "Introducing Chromecast. The easiest way to enjoy online video and music on your TV. For when you want to make Buster's big meltdowns even bigger. For $35. Learn how to use Chromecast with Netflix and more at google.com/chromecast.",
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4'],
+                'subtitle': 'By Google',
+                'thumb': 'images/ForBiggerMeltdowns.jpg',
+                'title': 'For Bigger Meltdowns'
+            },
+            {
+                'description': 'Sintel is an independently produced short film, initiated by the Blender Foundation as a means to further improve and validate the free/open source 3D creation suite Blender. With initial funding provided by 1000s of donations via the internet community, it has again proven to be a viable development model for both open 3D technology as for independent animation film.\nThis 15 minute film has been realized in the studio of the Amsterdam Blender Institute, by an international team of artists and developers. In addition to that, several crucial technical and creative targets have been realized online, by developers and artists and teams all over the world.\nwww.sintel.org',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'],
+                'subtitle': 'By Blender Foundation',
+                'thumb': 'images/Sintel.jpg',
+                'title': 'Sintel'
+            },
+            {
+                'description': 'Smoking Tire takes the all-new Subaru Outback to the highest point we can find in hopes our customer-appreciation Balloon Launch will get some free T-shirts into the hands of our viewers.',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4'],
+                'subtitle': 'By Garage419',
+                'thumb': 'images/SubaruOutbackOnStreetAndDirt.jpg',
+                'title': 'Subaru Outback On Street And Dirt'
+            },
+            {
+                'description': 'Tears of Steel was realized with crowd-funding by users of the open source 3D creation tool Blender. Target was to improve and test a complete open and free pipeline for visual effects in film - and to make a compelling sci-fi film in Amsterdam, the Netherlands.  The film itself, and all raw material used for making it, have been released under the Creatieve Commons 3.0 Attribution license. Visit the tearsofsteel.org website to find out more about this, or to purchase the 4-DVD box with a lot of extras.  (CC) Blender Foundation - http://www.tearsofsteel.org',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4'],
+                'subtitle': 'By Blender Foundation',
+                'thumb': 'images/TearsOfSteel.jpg',
+                'title': 'Tears of Steel'
+            },
+            {
+                'description': "The Smoking Tire heads out to Adams Motorsports Park in Riverside, CA to test the most requested car of 2010, the Volkswagen GTI. Will it beat the Mazdaspeed3's standard-setting lap time? Watch and see...",
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4'],
+                'subtitle': 'By Garage419',
+                'thumb': 'images/VolkswagenGTIReview.jpg',
+                'title': 'Volkswagen GTI Review'
+            },
+            {
+                'description': 'The Smoking Tire is going on the 2010 Bullrun Live Rally in a 2011 Shelby GT500, and posting a video from the road every single day! The only place to watch them is by subscribing to The Smoking Tire or watching at BlackMagicShine.com',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4'],
+                'subtitle': 'By Garage419',
+                'thumb': 'images/WeAreGoingOnBullrun.jpg',
+                'title': 'We Are Going On Bullrun'
+            },
+            {
+                'description': 'The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car. The Smoking Tire meets up with Chris and Jorge from CarsForAGrand.com to see just how far $1,000 can go when looking for a car.',
+                'sources': ['http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4'],
+                'subtitle': 'By Garage419',
+                'thumb': 'images/WhatCarCanYouGetForAGrand.jpg',
+                'title': 'What care can you get for a grand?'
+            }
+        ]
+    }]
+};

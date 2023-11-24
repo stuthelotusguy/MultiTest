@@ -2,6 +2,69 @@ var Gameroom = null;
 var Ourroom = null;
 var myId = null;
 
+class FirebuttonController {
+    constructor(stickID) {
+        this.id = stickID;
+        let stick = document.getElementById(stickID);
+
+        // location from which drag begins, used to calculate offsets
+        this.dragStart = null;
+
+        // track touch identifier in case multiple joysticks present
+        this.touchId = null;
+
+        this.active = false;
+        this.value = { x: 0, y: 0 };
+
+        let self = this;
+
+        function handleDown(event) {
+            self.active = true;
+
+            // all drag movements are instantaneous
+            stick.style.transition = '0s';
+
+            // touch event fired before mouse event; prevent redundant mouse event from firing
+            event.preventDefault();
+
+            if (event.changedTouches)
+                self.dragStart = { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
+            else
+                self.dragStart = { x: event.clientX, y: event.clientY };
+
+            // if this is a touch event, keep track of which one
+            if (event.changedTouches)
+                self.touchId = event.changedTouches[0].identifier;
+        }
+
+        function handleMove(event) {
+        }
+
+        function handleUp(event) {
+            if (!self.active) return;
+
+            // if this is a touch event, make sure it is the right one
+            if (event.changedTouches && self.touchId != event.changedTouches[0].identifier) return;
+
+            // transition the joystick position back to center
+            stick.style.transition = '.2s';
+            stick.style.transform = `translate3d(0px, 0px, 0px)`;
+
+            // reset everything
+            self.value = { x: 0, y: 0 };
+            self.touchId = null;
+            self.active = false;
+        }
+
+        stick.addEventListener('mousedown', handleDown);
+        stick.addEventListener('touchstart', handleDown);
+        document.addEventListener('mousemove', handleMove, { passive: false });
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        document.addEventListener('mouseup', handleUp);
+        document.addEventListener('touchend', handleUp);
+    }
+}
+
 class JoystickController {
     // stickID: ID of HTML element (representing joystick) that will be dragged
     // maxDistance: maximum amount joystick can move in any direction
@@ -104,6 +167,7 @@ class JoystickController {
 }
 
 let joystick1 = new JoystickController("stick1", 64, 8);
+let firebuttonController1 = new FirebuttonController("button");
 
 controls = {
     up: 0,
@@ -134,6 +198,7 @@ class gameObject {
                 Ourroom = room;
                 console.log(room)
                 myId = room.sessionId
+                Ourroom.send("message", document.getElementById('name').value + " has joined the chat!");
                 room.onStateChange.once(function (state) {
                     console.log("initial room state:", state);
                 });
@@ -169,11 +234,49 @@ class gameObject {
                     document.getElementById('messages').style.visibility = "hidden";
                     //document.getElementById('controls').style.visibility = "visible";
                     document.getElementById('joystick').style.visibility = "visible";
+                    document.getElementById('stick1').style.visibility = "visible";
+                    document.getElementById('button').style.visibility = "visible";
                     //$('.full').addClass('show');
+                    if (document.getElementById('castbutton') !== undefined) {
+                        document.getElementById('castbutton').click();
+                    }
+
                     localCar.name = document.getElementById('name').value;
                     client.joinOrCreate("tenfoot").then(room_instance => {
                         Gameroom = room_instance;
+                        carsById[Gameroom.sessionId] = localCar;
                         sendParams(localCar);
+
+                        // listen to patches coming from the server
+                        Gameroom.state.players.onAdd(function (player, sessionId) {
+                            player.onChange(function (changes) {
+                                let car = localCar;
+                                if (player.sessionId === Gameroom.sessionId) {
+                                    changes.forEach(change => {
+                                        console.log(change.field);
+                                        console.log(change.value);
+                                        console.log(change.previousValue);
+                                        if (change.field === "x") { car.x = change.value; }
+                                        if (change.field === "y") { car.y = change.value; }
+                                        if (change.field === "xVelocity") { car.xVelocity = change.value; }
+                                        if (change.field === "yVelocity") { car.yVelocity = change.value; }
+                                        if (change.field === "power") { car.power = change.value; }
+                                        if (change.field === "reverse") { car.reverse = change.value; }
+                                        if (change.field === "angle") { car.angle = change.value; }
+                                        if (change.field === "angularVelocity") { car.angularVelocity = change.value; }
+                                        if (change.field === "isThrottling") { car.isThrottling = change.value; }
+                                        if (change.field === "isReversing") { car.isReversing = change.value; }
+                                        if (change.field === "isShooting") { car.isShooting = change.value; }
+                                        if (change.field === "isTurningLeft") { car.isTurningLeft = change.value; }
+                                        if (change.field === "isTurningRight") { car.isTurningRight = change.value; }
+                                        if (change.field === "isHit") { car.isHit = change.value; }
+                                        if (change.field === "isShot") { car.isShot = change.value; }
+                                        if (change.field === "name") { car.name = change.value; }
+                                        if (change.field === "points") { car.points = change.value; }
+                                    })
+                                }
+                            })
+                        });
                     });
                 });
             })
@@ -199,6 +302,7 @@ class gameObject {
         function sendParams(car) {
             if (Gameroom) {
                 Gameroom.send("move", {
+                    sessionId: Gameroom.sessionId,
                     x: car.x,
                     y: car.y,
                     xVelocity: car.xVelocity,
@@ -233,6 +337,7 @@ class gameObject {
         const HEIGHT = 1000;
 
         const localCar = {
+            sessionId: "id",
             x: WIDTH / 2,
             y: HEIGHT / 2,
             xVelocity: 0,
@@ -471,7 +576,10 @@ function update(controls) {
         controls.left = 0;
         controls.right = 0;
     }
-    controls.shoot = 0;
+    if (firebuttonController1.active)
+        controls.shoot = 1;
+    else
+        controls.shoot = 0;
 }
 
 function loop() {
@@ -484,6 +592,8 @@ window.onload = function () {
 
     document.getElementById('lobby').style.visibility = "hidden";
     document.getElementById('joystick').style.visibility = "hidden";
+    document.getElementById('stick1').style.visibility = "hidden";
+    document.getElementById('button').style.visibility = "hidden";
     //document.getElementById('controls').style.visibility = "hidden";
     //$('.full').addClass('hide');
 
@@ -491,12 +601,11 @@ window.onload = function () {
     var host = window.document.URL.replace('/Client/index.html?', '');
     console.log(host);
 	*/
-    //host = window.document.location.host.replace(/:.*/, '');
-    /*console.log(host)
+    host = window.document.location.host.replace(/:.*/, '');
+    console.log(host)
     const serverWebsocketUrl = location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : ':2567/')
-    */
 
-    var serverWebsocketUrl = "ws://192.168.1.179:2567/";
+    //var serverWebsocketUrl = "ws://68.183.196.183:2567/";
 
     console.log(serverWebsocketUrl);
     var client = new Colyseus.Client(serverWebsocketUrl);

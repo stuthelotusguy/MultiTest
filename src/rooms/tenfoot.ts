@@ -2,6 +2,8 @@ import { Room, Client } from "colyseus";
 import { Schema, type, MapSchema } from "@colyseus/schema";
 
 export class Player extends Schema {
+    @type("string")
+    sessionId = "id";
     @type("number")
     x = Math.floor(Math.random() * 400);
     @type("number")
@@ -53,7 +55,9 @@ export class State extends Schema {
     }
 
     movePlayer(sessionId: string, movement: any) {
-        if (movement.x !== 'undefined') {
+        if (movement.sessionId !== 'undefined') {
+            this.players.get(sessionId).sessionId = movement.sessionId;
+        } if (movement.x !== 'undefined') {
             this.players.get(sessionId).x = movement.x;
         } if (movement.y !== 'undefined') {
             this.players.get(sessionId).y = movement.y;
