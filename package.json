@@ -1,7 +1,7 @@
 {
-  "name": "colyseus-examples",
-  "version": "1.0.1",
-  "description": "Basic examples demonstrating Colyseus features",
+  "name": "colyseus-stu",
+  "version": "0.0.1",
+  "description": "Tests of Colyseus features",
   "main": "lib/index.js",
   "scripts": {
     "start": "tsx watch src/index.ts",
@@ -11,8 +11,8 @@
   "engines": {
     "node": ">=16.x"
   },
-  "author": "Endel Dreyer",
-  "license": "MIT",
+  "author": "Stuart Russell",
+  "license": "None",
   "devDependencies": {
     "@colyseus/uwebsockets-transport": "^0.15.0",
     "@types/cors": "^2.8.6",
@@ -21,14 +21,20 @@
     "typescript": "^4.8.4",
     "uwebsockets-express": "^1.1.14"
   },
-  "dependencies": {
-    "@colyseus/monitor": "^0.15.0",
-    "@colyseus/playground": "^0.15.2",
-    "@colyseus/tools": "^0.15.0",
-    "colyseus": "^0.15.0",
-    "cors": "^2.8.5",
-    "express": "^4.16.4",
-    "serve-index": "^1.8.0",
-    "superagent": "^3.8.1"
-  }
+    "dependencies": {
+        "@colyseus/monitor": "^0.15.0",
+        "@colyseus/playground": "^0.15.2",
+        "@colyseus/tools": "^0.15.0",
+        "colyseus": "^0.15.11",
+        "cors": "^2.8.5",
+        "express": "^4.16.4",
+        "serve-index": "^1.8.0",
+        "superagent": "^3.8.1",
+        "eslint": "8.48.0",
+        "eslint-config-next": "13.4.19",
+        "next": "13.4.19",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "typing-indicator": "^1.0.0"
+    }
 }

@@ -231,11 +231,11 @@ class gameObject {
                 $('#startGameBtn').on('click', function (event) {
                     $('.intro-section').addClass('hide');
                     $('.lobby').addClass('hide');
-                    document.getElementById('messages').style.visibility = "hidden";
                     //document.getElementById('controls').style.visibility = "visible";
                     document.getElementById('joystick').style.visibility = "visible";
                     document.getElementById('stick1').style.visibility = "visible";
                     document.getElementById('button').style.visibility = "visible";
+                    document.getElementById('messages').style.visibility = "visible";
                     //$('.full').addClass('show');
                     if (document.getElementById('castbutton') !== undefined) {
                         document.getElementById('castbutton').click();

@@ -2,31 +2,34 @@
 <html>
 <head>
 
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<!-- Colyseus -->
-	<script src="https://unpkg.com/colyseus.js@^0.15.11/dist/colyseus.js"></script>
+    <!-- Colyseus -->
+    <script src="https://unpkg.com/colyseus.js@^0.15.11/dist/colyseus.js"></script>
 
-	<!-- Bootstrap -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-	<!-- jQuery -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-	<!-- Animate.css -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <!-- QR -->
+    <script type="text/javascript" src="assets/javascript/QR/qrcode.js"></script>
 
-	<!-- Compiled and minified CSS -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 
-	<!-- Google Fonts -->
-	<link href="https://fonts.googleapis.com/css?family=Monoton|Space+Mono:700" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.99.0/css/materialize.min.css">
 
-	<!-- Style.css -->
-	<link href="assets/css/tenfoot.css" rel="stylesheet" type="text/css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Monoton|Space+Mono:700" rel="stylesheet">
 
-	<title>Stu's Car Test</title>
+    <!-- Style.css -->
+    <link href="assets/css/tenfoot.css" rel="stylesheet" type="text/css">
+
+    <title>Stu's Car Test</title>
 
 </head>
 <body>
@@ -39,8 +42,8 @@
                 <div class="bullets"></div>
                 <div class="cars">
                     <!--
-                <div class="car red"><div class="car-body"><div class="car-roof"></div></div><div class="car-name"></div></div>
-                -->
+                    <div class="car red"><div class="car-body"><div class="car-roof"></div></div><div class="car-name"></div></div>
+                    -->
                 </div>
                 <div class="map"></div>
             </div>
@@ -50,13 +53,51 @@
 
         <!--
 
-    <div class="buttons">
-        <button class="disconnect">Disconnect</button>
-        <button class="clearscreen">Clear screen</button>
+        <div class="buttons">
+            <button class="disconnect">Disconnect</button>
+            <button class="clearscreen">Clear screen</button>
+        </div>
+        <div class="name"><div class="name-bg"></div><form><input autofocus placeholder="Nickname" autocomplete="nickname"><button>Play!</button></form></div>
+        <div class="bottomleft">Use keyboard (up/down/left/right/space), swiping (shoot with second finger) or gamepad to drive the red car with other cars online!</div>
+                -->
     </div>
-    <div class="name"><div class="name-bg"></div><form><input autofocus placeholder="Nickname" autocomplete="nickname"><button>Play!</button></form></div>
-    <div class="bottomleft">Use keyboard (up/down/left/right/space), swiping (shoot with second finger) or gamepad to drive the red car with other cars online!</div>
-            -->
+    <script type="text/javascript">
+        var size = window.innerHeight / 5;
+    </script>
+    <div id="qrcode" style="width: size; position: absolute; right:0%; bottom:0%;"></div>
+
+    <script type="text/javascript">
+        var host = window.document.location.host.replace(/:.*/, '');
+        console.log(host)
+        const serverAdress = location.protocol.replace("http", "ws") + "//" + host + (location.port ? ':' + location.port : '')
+        console.log(serverAdress)
+        var QRText = serverAdress;
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            width: size,
+            height: size
+        });
+
+        function makeCode() {
+            var QRText = "http://" + host + ":2567/clients.html";
+
+            qrcode.makeCode(QRText);
+        }
+
+        makeCode();
+
+        $("#text").
+            on("blur", function () {
+                makeCode();
+            }).
+            on("keydown", function (e) {
+                if (e.keyCode == 13) {
+                    makeCode();
+                }
+            });</script>
+
+    <div id="messages"></div>
+    </div>
+
     </div>
 
     <!-- Compiled and minified JavaScript materialize -->

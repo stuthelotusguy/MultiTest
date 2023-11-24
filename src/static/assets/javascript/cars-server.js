@@ -505,6 +505,8 @@ window.onload = function () {
     console.log(serverWebsocketUrl);
     var client = new Colyseus.Client(serverWebsocketUrl);
 
+    resizeHandler();
+
     gameObject.join(client);
 }
 
